@@ -123,11 +123,7 @@ class CalculatorViewModel: ObservableObject {
             // First number, set it as previous value
             previousValue = inputValue
             operation = nextOperation
-            if inputValue == 0 && nextOperation == "subtract" {
-                fullEquationChain = getOperationSymbol(nextOperation)
-            } else {
-                fullEquationChain = display + getOperationSymbol(nextOperation)
-            }
+            fullEquationChain = display + getOperationSymbol(nextOperation)
             waitingForOperand = true
         } else if let currentOperation = operation {
             // There's already a pending operation
@@ -192,6 +188,11 @@ class CalculatorViewModel: ObservableObject {
         waitingForOperand = false
     }
     
+    func deleteHistory(item: CalculationHistory) {
+        history.removeAll { $0.id == item.id }
+        saveHistory()
+    }
+
     // MARK: - Evaluate Complete Expression
     private func evaluateCompleteExpression(_ expression: String) -> Double {
         let operators = ["+", "−", "×", "÷"]
@@ -303,14 +304,11 @@ class CalculatorViewModel: ObservableObject {
     // MARK: - Toggle Sign
     func toggleSign() {
         if display != "0" {
-            let oldDisplay = display
             let newDisplay = display.hasPrefix("-") ? String(display.dropFirst()) : "-" + display
             display = newDisplay
             
             if !fullEquationChain.isEmpty {
-                if fullEquationChain.hasSuffix(oldDisplay) {
-                    fullEquationChain = String(fullEquationChain.dropLast(oldDisplay.count)) + newDisplay
-                }
+                fullEquationChain = fullEquationChain.replacingOccurrences(of: display, with: newDisplay)
             } else {
                 fullEquationChain = newDisplay
             }
@@ -568,6 +566,15 @@ struct ContentView: View {
                                     }
                                     .buttonStyle(PlainButtonStyle())
                                     .opacity(calculator.getHistoryItemOpacity(id: calc.id))
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button(role: .destructive) {
+                                            withAnimation {
+                                                calculator.deleteHistory(item: calc)
+                                            }
+                                        } label: {
+                                            Label("Delete", systemImage: "trash.fill")
+                                        }
+                                    }
                                 }
                             }
                             .padding(.vertical, 4)
