@@ -299,11 +299,14 @@ class CalculatorViewModel: ObservableObject {
     // MARK: - Toggle Sign
     func toggleSign() {
         if display != "0" {
+            let oldDisplay = display
             let newDisplay = display.hasPrefix("-") ? String(display.dropFirst()) : "-" + display
             display = newDisplay
             
             if !fullEquationChain.isEmpty {
-                fullEquationChain = fullEquationChain.replacingOccurrences(of: display, with: newDisplay)
+                if fullEquationChain.hasSuffix(oldDisplay) {
+                    fullEquationChain = String(fullEquationChain.dropLast(oldDisplay.count)) + newDisplay
+                }
             } else {
                 fullEquationChain = newDisplay
             }
