@@ -123,7 +123,11 @@ class CalculatorViewModel: ObservableObject {
             // First number, set it as previous value
             previousValue = inputValue
             operation = nextOperation
-            fullEquationChain = display + getOperationSymbol(nextOperation)
+            if inputValue == 0 && nextOperation == "subtract" {
+                fullEquationChain = getOperationSymbol(nextOperation)
+            } else {
+                fullEquationChain = display + getOperationSymbol(nextOperation)
+            }
             waitingForOperand = true
         } else if let currentOperation = operation {
             // There's already a pending operation

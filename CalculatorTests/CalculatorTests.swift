@@ -166,4 +166,12 @@ class CalculatorViewModelTests: XCTestCase {
         viewModel.performOperation("equals")
         XCTAssertEqual(viewModel.display, "15", "Error: 10 - (-5) should be 15")
     }
+
+    func testLeadingNegative() {
+        viewModel.performOperation("subtract")
+        viewModel.inputNumber("5")
+        XCTAssertEqual(viewModel.fullEquationChain, "−5")
+        viewModel.performOperation("equals")
+        XCTAssertEqual(viewModel.display, "-5")
+    }
 }
